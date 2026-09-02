@@ -1,10 +1,11 @@
 package com.geolocalizacao.SistemaDeGeolocalizacaoEJC.controller;
 
-import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.dtos.CadastroVisitaDTO;
-import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.dtos.VisitaResponseDTO;
+import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.dtos.visita.CadastroVisitaDTO;
+import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.dtos.visita.VisitaResponseDTO;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.entity.Visita;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.service.VisitaService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,14 +14,11 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/visita")
+@RequestMapping("/visita")
+@RequiredArgsConstructor
 public class VisitaController {
 
     private final VisitaService visitaService;
-
-    public VisitaController(VisitaService visitaService){
-        this.visitaService = visitaService;
-    }
 
     @PostMapping("/cadastrar")
     public ResponseEntity<VisitaResponseDTO> cadastrarVisita(@RequestBody @Valid CadastroVisitaDTO dto){

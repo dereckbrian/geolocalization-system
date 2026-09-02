@@ -1,0 +1,523 @@
+<main class="min-h-dvh bg-slate-50">
+
+  <!-- HEADER -->
+  <header class="bg-white border-b border-slate-200">
+    <div class="mx-auto max-w-lg px-5 pb-6 pt-8">
+
+      <div
+        class="
+          mb-4
+          flex
+          h-11
+          w-11
+          items-center
+          justify-center
+          rounded-xl
+          bg-blue-600
+          text-xl
+          text-white
+        "
+      >
+        📍
+      </div>
+
+      <h1 class="text-2xl font-bold text-slate-900">
+        Registrar localização
+      </h1>
+
+      <p class="mt-2 text-sm leading-6 text-slate-500">
+        Selecione o encontrista e registre a localização exata da residência.
+      </p>
+
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-lg space-y-6 px-5 py-6">
+
+    <!-- DADOS -->
+    <section>
+
+      <p
+        class="
+          mb-3
+          text-xs
+          font-bold
+          uppercase
+          tracking-wider
+          text-slate-400
+        "
+      >
+        Dados do encontrista
+      </p>
+
+      <div
+        class="
+          space-y-5
+          rounded-2xl
+          border
+          border-slate-200
+          bg-white
+          p-5
+          shadow-sm
+        "
+      >
+
+        <!-- TIOS -->
+        <div>
+
+          <label
+            for="tio"
+            class="mb-2 block text-sm font-semibold text-slate-700"
+          >
+            Tios responsáveis
+          </label>
+
+          <select
+            id="tio"
+            [(ngModel)]="tioSelecionado"
+            (ngModelChange)="carregarJovens()"
+            class="
+              min-h-12
+              w-full
+              rounded-xl
+              border
+              border-slate-300
+              bg-white
+              px-4
+              text-slate-900
+              outline-none
+              transition
+              focus:border-blue-500
+              focus:ring-4
+              focus:ring-blue-100
+            "
+          >
+            <option value="">
+              Selecione os tios
+            </option>
+
+            @for (tio of tios; track tio.id) {
+              <option [value]="tio.id">
+                {{ tio.nomeTios }}
+              </option>
+            }
+
+          </select>
+
+        </div>
+
+        <!-- JOVEM -->
+        <div>
+
+          <label
+            for="jovem"
+            class="mb-2 block text-sm font-semibold text-slate-700"
+          >
+            Encontrista
+          </label>
+
+          <select
+            id="jovem"
+            [(ngModel)]="jovemSelecionado"
+            [disabled]="!tioSelecionado || carregandoJovens"
+            class="
+              min-h-12
+              w-full
+              rounded-xl
+              border
+              border-slate-300
+              bg-white
+              px-4
+              text-slate-900
+              outline-none
+              transition
+              disabled:cursor-not-allowed
+              disabled:bg-slate-100
+              disabled:text-slate-400
+              focus:border-blue-500
+              focus:ring-4
+              focus:ring-blue-100
+            "
+          >
+
+            <option value="">
+
+              @if (!tioSelecionado) {
+                Selecione os tios primeiro
+              } @else if (carregandoJovens) {
+                Carregando encontristas...
+              } @else {
+                Selecione o encontrista
+              }
+
+            </option>
+
+            @for (jovem of jovens; track jovem.id) {
+              <option [value]="jovem.id">
+                {{ jovem.nome }}
+              </option>
+            }
+
+          </select>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- LOCALIZAÇÃO -->
+    <section>
+
+      <p
+        class="
+          mb-3
+          text-xs
+          font-bold
+          uppercase
+          tracking-wider
+          text-slate-400
+        "
+      >
+        Localização da residência
+      </p>
+
+      @if (!localizacaoCapturada) {
+
+        <div
+          class="
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            p-5
+            shadow-sm
+          "
+        >
+          <div class="flex items-start gap-4">
+
+            <div
+              class="
+                flex
+                h-11
+                w-11
+                shrink-0
+                items-center
+                justify-center
+                rounded-xl
+                bg-slate-100
+                text-xl
+              "
+            >
+              📍
+            </div>
+
+            <div>
+
+              <h2 class="font-semibold text-slate-900">
+                Localização ainda não registrada
+              </h2>
+
+              <p class="mt-1 text-sm leading-5 text-slate-500">
+                Fique próximo à residência e permita o acesso ao GPS.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            (click)="capturarLocalizacao()"
+            [disabled]="
+              !jovemSelecionado ||
+              capturandoLocalizacao
+            "
+            class="
+              mt-5
+              min-h-12
+              w-full
+              rounded-xl
+              bg-slate-900
+              px-4
+              font-semibold
+              text-white
+              transition
+              active:scale-[0.99]
+              hover:bg-slate-800
+              disabled:cursor-not-allowed
+              disabled:bg-slate-300
+            "
+          >
+
+            @if (capturandoLocalizacao) {
+              Obtendo localização...
+            } @else {
+              Capturar localização
+            }
+          </button>
+        </div>
+
+      } @else {
+
+        <div
+          class="
+            rounded-2xl
+            border
+            border-emerald-200
+            bg-emerald-50
+            p-5
+          "
+        >
+          <div class="flex items-start gap-4">
+
+            <div
+              class="
+                flex
+                h-11
+                w-11
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                bg-emerald-600
+                text-lg
+                font-bold
+                text-white
+              "
+            >
+              ✓
+            </div>
+
+            <div class="flex-1">
+
+              <h2 class="font-semibold text-emerald-950">
+                Localização capturada
+              </h2>
+
+              <p class="mt-1 text-sm text-emerald-700">
+                A posição da residência está pronta para ser enviada.
+              </p>
+
+            </div>
+
+          </div>
+
+          <button
+            type="button"
+            (click)="capturarLocalizacao()"
+            [disabled]="capturandoLocalizacao"
+            class="
+                mt-5
+                min-h-12
+                w-full
+                rounded-xl
+                border
+                border-emerald-300
+                px-4
+                text-sm
+                font-semibold
+                text-emerald-800
+                transition
+                disabled:cursor-wait
+                disabled:opacity-60
+            "
+            >
+
+            @if (capturandoLocalizacao) {
+                Atualizando localização...
+            } @else {
+                Atualizar localização
+            }
+
+            </button>
+
+        </div>
+
+      }
+
+    </section>
+
+
+    <!-- ERROS -->
+
+    @if (mensagemErro) {
+
+      <div
+        class="
+          rounded-xl
+          border
+          border-red-200
+          bg-red-50
+          p-4
+          text-sm
+          text-red-700
+        "
+      >
+        {{ mensagemErro }}
+      </div>
+
+    }
+
+
+    @if (mensagemSucesso) {
+
+      <div
+        class="
+          rounded-xl
+          border
+          border-emerald-200
+          bg-emerald-50
+          p-4
+          text-sm
+          text-emerald-700
+        "
+      >
+        {{ mensagemSucesso }}
+      </div>
+
+    }
+
+
+    <!-- CTA -->
+
+    <button
+      type="button"
+      (click)="abrirConfirmacao()"
+      [disabled]="!podeEnviar"
+      class="
+        min-h-14
+        w-full
+        rounded-xl
+        bg-blue-600
+        px-5
+        text-base
+        font-bold
+        text-white
+        shadow-sm
+        transition
+        active:scale-[0.99]
+        hover:bg-blue-700
+        disabled:cursor-not-allowed
+        disabled:bg-slate-300
+        disabled:shadow-none
+      "
+    >
+
+      @if (enviando) {
+        Enviando...
+      } @else {
+        Enviar localização
+      }
+
+    </button>
+
+    <p class="pb-5 text-center text-xs text-slate-400">
+      Confira os dados antes de enviar.
+    </p>
+
+  </div>
+
+  @if (mostrarConfirmacao) {
+
+  <div
+    class="
+      fixed
+      inset-0
+      z-50
+      flex
+      items-center
+      justify-center
+      bg-black/50
+      px-5
+    "
+  >
+
+    <div
+      role="dialog"
+      aria-modal="true"
+      class="
+        w-full
+        max-w-sm
+        rounded-2xl
+        bg-white
+        p-6
+        shadow-2xl
+      "
+    >
+
+      <div
+        class="
+          mx-auto
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          rounded-full
+          bg-blue-100
+          text-xl
+        "
+      >
+        📍
+      </div>
+
+      <div class="mt-4 text-center">
+
+        <h2 class="text-xl font-bold text-slate-900">
+          Confirmar localização?
+        </h2>
+
+        <p class="mt-2 text-sm leading-6 text-slate-500">
+          Verifique se você está na residência correta antes de enviar.
+        </p>
+
+      </div>
+
+      <div class="mt-6 flex gap-3">
+
+        <button
+          type="button"
+          (click)="cancelarEnvio()"
+          class="
+            min-h-12
+            flex-1
+            rounded-xl
+            border
+            border-slate-300
+            bg-white
+            px-4
+            font-semibold
+            text-slate-700
+            transition
+            hover:bg-slate-50
+          "
+        >
+          Voltar
+        </button>
+
+        <button
+          type="button"
+          (click)="confirmarEnvio()"
+          class="
+            min-h-12
+            flex-1
+            rounded-xl
+            bg-blue-600
+            px-4
+            font-semibold
+            text-white
+            transition
+            hover:bg-blue-700
+          "
+        >
+          Confirmar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}
+
+</main>

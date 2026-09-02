@@ -1,4 +1,4 @@
-package com.geolocalizacao.SistemaDeGeolocalizacaoEJC.dtos;
+package com.geolocalizacao.SistemaDeGeolocalizacaoEJC.dtos.visita;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -7,13 +7,10 @@ import java.util.UUID;
 
 public record CadastroVisitaDTO(
         @NotNull
-        UUID jovenID,
+        UUID jovemID,
 
         @NotNull
         UUID tioID,
-
-        @NotBlank
-        String urlFoto,
 
         @NotNull
         Double latitude,

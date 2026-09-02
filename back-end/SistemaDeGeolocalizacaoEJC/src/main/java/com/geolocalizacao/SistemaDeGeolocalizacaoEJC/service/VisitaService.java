@@ -1,13 +1,18 @@
 package com.geolocalizacao.SistemaDeGeolocalizacaoEJC.service;
 
-import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.dtos.CadastroVisitaDTO;
-import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.dtos.VisitaResponseDTO;
+import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.dtos.visita.CadastroVisitaDTO;
+import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.dtos.visita.VisitaResponseDTO;
+import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.entity.Jovem;
+import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.entity.Tio;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.entity.Visita;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.enums.StatusVisita;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.exceptions.JovemHasExistException;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.exceptions.VisitaNotFoundException;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.mappers.VisitaMapper;
+import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.repository.JovemRepository;
+import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.repository.TioRespository;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.repository.VisitaRepository;
+import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -20,41 +25,46 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class VisitaService {
 
     private final VisitaRepository visitaRepository;
     private final VisitaMapper visitaMapper;
+    private final JovemRepository jovemRepository;
+    private final TioRespository tioRespository;
 
     private static final Double LATITUDE_IGREJA = -15.549093;
     private static final Double LONGITUDE_IGREJA = -47.330434;
 
-    public VisitaService(VisitaRepository visitaRepository, VisitaMapper visitaMapper){
-        this.visitaRepository = visitaRepository;
-        this.visitaMapper = visitaMapper;
-    }
-
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
     @Transactional
-    public VisitaResponseDTO cadastrarVisita(CadastroVisitaDTO dto){
+    public VisitaResponseDTO cadastrarVisita(CadastroVisitaDTO dto) {
 
-        if (visitaRepository.existsByJovemId(dto.jovenID())) {
+        if (visitaRepository.existsByJovemId(dto.jovemID())) {
             throw new JovemHasExistException();
         }
 
-        Coordinate coordinate = new Coordinate(dto.longitude(), dto.latitude());
-        Point casaJovem = geometryFactory.createPoint(coordinate);
+        Jovem jovem = jovemRepository.getReferenceById(dto.jovemID());
+        Tio tio = tioRespository.getReferenceById(dto.tioID());
 
-        Visita visitaIncompleta = visitaMapper.toEntity(dto);
+        Coordinate coordinate =
+                new Coordinate(dto.longitude(), dto.latitude());
 
-        Visita visitaProntaParaSalvar = visitaIncompleta.toBuilder()
+        Point casaJovem =
+                geometryFactory.createPoint(coordinate);
+
+        Visita visita = visitaMapper.toEntity(dto)
+                .toBuilder()
+                .jovem(jovem)
+                .tio(tio)
                 .coordenada(casaJovem)
                 .statusVisita(StatusVisita.PENDENTE)
                 .build();
 
-        visitaRepository.save(visitaProntaParaSalvar);
+        Visita visitaSalva = visitaRepository.save(visita);
 
-        return visitaMapper.toEntityToDTO(visitaProntaParaSalvar);
+        return visitaMapper.toEntityToDTO(visitaSalva);
     }
 
     public List<Visita> gerarRotaDoDia(int quantidadeDeCasas) {

@@ -10,14 +10,18 @@ import java.util.UUID;
 @Getter
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "encontrista")
+@Table(name = "jovem")
 public class Jovem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(length = 20, unique = true, nullable = false)
+    @Column(length = 100, nullable = false)
     private String nome;
+
+    @ManyToOne
+    @JoinColumn(name = "tio_id", nullable = false)
+    private Tio tio;
 
 }

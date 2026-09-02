@@ -19,11 +19,8 @@ public class Visita {
     private UUID id;
 
     @OneToOne
-    @JoinColumn(name = "encontrista_id", referencedColumnName = "id", nullable = false, unique = true)
+    @JoinColumn(name = "jovem_id", referencedColumnName = "id", nullable = false, unique = true)
     private Jovem jovem;
-
-    @Column(name = "url_foto", nullable = false)
-    private String urlFoto;
 
     @ManyToOne
     @JoinColumn(name = "tio_id", referencedColumnName = "id", nullable = false)
