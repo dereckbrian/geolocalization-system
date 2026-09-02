@@ -1,34 +1,82 @@
-#  GeoField Tracker - Sistema de Gestão e Roteamento de Visitas de Campo
+# GeoField Tracker
 
-Um sistema de geolocalização com interface web focada no mobile (Progressive Web App), desenvolvido para otimizar a logística de equipes de pesquisa e assistência em campo. A aplicação descentraliza a coleta de coordenadas espaciais e resolve problemas de ineficiência de deslocamento, criando rotas inteligentes e automatizadas para os agentes a partir de uma base operacional.
+Sistema de gestão e geolocalização de visitas de campo, desenvolvido com
+Spring Boot, Angular e PostgreSQL/PostGIS.
+
+A aplicação permite que equipes registrem coordenadas geográficas diretamente
+em campo por meio de uma PWA mobile-first. Os pontos são armazenados como
+geometrias espaciais no PostGIS e podem posteriormente ser utilizados em
+consultas de proximidade, análise territorial e otimização de rotas.
+
+O objetivo é reduzir a dependência de endereços imprecisos e processos
+manuais de georreferenciamento, centralizando a coleta e o processamento
+de dados espaciais em uma única aplicação.
 
 ## Funcionalidades
 
-* **Registro de Visitas em Tempo Real:** Durante o trabalho em campo, os agentes acessam o sistema via smartphone, inserem seus dados e os do assistido/entrevistado, anexam uma comprovação fotográfica e salvam a localização exata (GPS) com um único clique.
-* **Descentralização de Dados Espaciais:** Elimina o gargalo operacional de depender de um único analista para inserir dados geográficos manualmente. Cada equipe alimenta o banco de dados diretamente do campo de forma autônoma.
-* **Roteamento Inteligente:** Ao iniciar um ciclo de visitas, o sistema calcula e retorna as 5 localizações mais próximas à Sede/Base, expandindo o raio de busca gradativamente. Isso evita rotas ineficientes, ziguezagues e economiza tempo de deslocamento da frota.
-* **Processamento Geoespacial:** O back-end recebe e trata os dados de latitude/longitude convertendo-os em objetos de geometria (`Point`), armazenando as coordenadas de forma otimizada para cálculos de distância.
-* **Integração com QGIS:** Permite a exportação e visualização avançada de todos os pontos de visitação diretamente no software QGIS para análise de densidade e cobertura territorial.
-* **Confiabilidade e Qualidade de Código:** O tratamento de dados e as regras de negócio geográficas no back-end possuem cobertura de testes unitários utilizando Mocks, garantindo a estabilidade da aplicação em produção.
+* **Registro de Localização:** captura da posição geográfica do dispositivo
+  utilizando a Geolocation API do navegador.
+
+* **Vinculação de Equipes e Visitados:** seleção de responsáveis e pessoas
+  previamente cadastradas antes do registro da localização.
+
+* **Armazenamento Geoespacial:** conversão de latitude e longitude para
+  geometria `Point` com SRID 4326 e persistência utilizando PostgreSQL/PostGIS.
+
+* **Consultas por Proximidade:** estrutura preparada para localizar pontos
+  próximos a uma determinada origem utilizando operações espaciais.
+
+* **Planejamento de Visitas:** desenvolvimento de estratégias para ordenar
+  e agrupar pontos de visita visando reduzir deslocamentos desnecessários.
+
+* **Integração com QGIS:** possibilidade de utilizar os dados geográficos
+  armazenados no PostGIS para visualização e análise espacial no QGIS.
+
+* **Testes Automatizados:** testes unitários das principais regras de negócio
+  utilizando JUnit, Mockito e MockMvc.
 
 ## Tecnologias Utilizadas
 
 O projeto foi construído utilizando o padrão de arquitetura de API RESTful com as seguintes tecnologias para garantir a eficiência na coleta e processamento de dados espaciais:
 
 ### Front-end
-* **Angular** (Construção da interface SPA)
-* **Design Mobile-First / PWA** (Foco total na usabilidade via smartphones em ambiente externo)
+
+* Angular
+* TypeScript
+* Tailwind CSS
+* Progressive Web App (PWA)
+* Geolocation API
 
 ### Back-end
-* **Java**
-* **Spring Boot** (Criação da API)
-* **Hibernate Spatial** (Tratamento de coordenadas e cálculos espaciais via `Point`)
-* **JUnit & Mockito** (Testes unitários automatizados)
 
-### Banco de Dados & Ferramentas
-* **PostgreSQL** (com extensão **PostGIS** para armazenamento de dados geoespaciais)
-* **QGIS** (Visualização e análise do mapeamento dos dados)
+* Java 21
+* Spring Boot
+* Spring Data JPA
+* Hibernate Spatial
+* MapStruct
+* JUnit
+* Mockito
+* MockMvc
+
+### Banco de Dados e Ferramentas
+
+* PostgreSQL
+* PostGIS
+* QGIS
+* Postman
+* Git / GitHub
 * **Postman** (Testes e documentação de endpoints)
 * **Git & GitHub** (Versionamento)
+
+  ## Roadmap
+
+- [x] Cadastro e consulta de responsáveis
+- [x] Consulta de visitados por responsável
+- [x] Captura de coordenadas pelo navegador
+- [x] Persistência geoespacial com PostGIS
+- [ ] Consulta de pontos por proximidade
+- [ ] Otimização da sequência de visitas
+- [ ] Visualização dos pontos em mapa
+- [ ] Autenticação e controle de acesso
 
 ---
