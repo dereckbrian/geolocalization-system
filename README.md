@@ -68,7 +68,7 @@ O projeto foi construído utilizando o padrão de arquitetura de API RESTful com
 * **Postman** (Testes e documentação de endpoints)
 * **Git & GitHub** (Versionamento)
 
-  ## Roadmap
+## Roadmap
 
 - [x] Cadastro e consulta de responsáveis
 - [x] Consulta de visitados por responsável
