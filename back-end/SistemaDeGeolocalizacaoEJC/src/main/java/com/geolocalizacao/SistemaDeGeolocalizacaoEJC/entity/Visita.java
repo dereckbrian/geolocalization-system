@@ -30,6 +30,8 @@ public class Visita {
     @Enumerated(EnumType.STRING)
     private StatusVisita statusVisita;
 
+    private Integer ordemRota;
+
     @Column(nullable = false, columnDefinition = "geometry(Point, 4326)")
     private Point coordenada;
 

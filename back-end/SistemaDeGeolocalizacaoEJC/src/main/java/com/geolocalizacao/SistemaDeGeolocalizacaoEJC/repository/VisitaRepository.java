@@ -1,6 +1,7 @@
 package com.geolocalizacao.SistemaDeGeolocalizacaoEJC.repository;
 
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.entity.Visita;
+import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.enums.StatusVisita;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,8 +17,7 @@ public interface VisitaRepository extends JpaRepository<Visita, UUID> {
 
     boolean existsByJovemId(UUID encontristaId);
 
-    @Query("SELECT v FROM Visita v " +
-            "WHERE v.statusVisita = 'PENDENTE' " +
-            "ORDER BY distance(v.coordenada, :pontoOrigem) ASC")
-    List<Visita> buscarPendentesMaisProximas(@Param("pontoOrigem") Point pontoOrigem, Pageable limitador);
+    List<Visita> findByStatusVisita(StatusVisita statusVisita);
+
+    List<Visita> findByOrdemRotaIsNotNullOrderByOrdemRotaAsc();
 }
