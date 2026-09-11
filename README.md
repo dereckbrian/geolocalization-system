@@ -2,7 +2,7 @@
 
 Sistema web para registro de localizações geográficas e organização de rotas de visitas em campo.
 
-A aplicação utiliza **Java 21, Spring Boot, Angular, PostgreSQL/PostGIS e OSRM** para realizar a coleta de coordenadas, armazenamento geoespacial e organização das visitas em uma sequência otimizada pela malha viária.
+A aplicação utiliza **Java, Spring Boot, Angular, PostgreSQL/PostGIS e OSRM** para realizar a coleta de coordenadas, armazenamento geoespacial e organização das visitas em uma sequência otimizada pela malha viária.
 
 O projeto surgiu de um problema real: diferentes pessoas precisam cadastrar previamente vários locais e, posteriormente, uma equipe precisa visitar esses pontos sem definir manualmente qual endereço deve ser atendido em seguida.
 
@@ -14,7 +14,7 @@ O sistema centraliza esse processo, desde a captura da localização até a gera
 
 ### Back-end
 
-- Java 21
+- Java 
 - Spring Boot
 - Spring Web
 - Spring Data JPA
