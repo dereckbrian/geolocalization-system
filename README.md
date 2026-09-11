@@ -1,12 +1,14 @@
-# GeoField Tracker
+# Sistema de Geolocalização e Roteamento de Visitas
 
-Sistema web para registro de localizações geográficas e planejamento de rotas de visitas em campo.
+Sistema web para registro de localizações geográficas e organização de rotas de visitas em campo.
 
-O projeto utiliza **Java 21, Spring Boot, Angular, PostgreSQL/PostGIS e OSRM** para realizar a coleta de coordenadas, armazenamento geoespacial e organização de visitas em uma sequência otimizada pela malha viária.
+A aplicação utiliza **Java 21, Spring Boot, Angular, PostgreSQL/PostGIS e OSRM** para realizar a coleta de coordenadas, armazenamento geoespacial e organização das visitas em uma sequência otimizada pela malha viária.
 
-A aplicação surgiu de um problema real: diferentes pessoas precisam cadastrar previamente vários locais e, posteriormente, uma equipe precisa visitar esses pontos sem definir manualmente qual endereço deve ser atendido em seguida.
+O projeto surgiu de um problema real: diferentes pessoas precisam cadastrar previamente vários locais e, posteriormente, uma equipe precisa visitar esses pontos sem definir manualmente qual endereço deve ser atendido em seguida.
 
 O sistema centraliza esse processo, desde a captura da localização até a geração e execução da rota.
+
+---
 
 ## Tecnologias
 
@@ -63,71 +65,25 @@ O sistema centraliza esse processo, desde a captura da localização até a gera
 
 A aplicação permite capturar a localização atual do dispositivo utilizando a **Geolocation API** do navegador.
 
-Antes do registro, o usuário seleciona os responsáveis e a pessoa previamente cadastrada que será associada à localização.
+Antes do registro, o usuário seleciona os responsáveis e a pessoa previamente cadastrada associada à localização.
 
-As informações são enviadas ao backend por meio de uma API REST.
-
----
+As coordenadas são enviadas ao backend por meio de uma API REST.
 
 ### Armazenamento geoespacial
 
-Latitude e longitude são convertidas no backend para uma geometria `Point` utilizando JTS/Hibernate Spatial.
+Latitude e longitude são convertidas no backend para uma geometria `Point` utilizando JTS e Hibernate Spatial.
 
-As coordenadas são armazenadas no PostgreSQL/PostGIS utilizando o **SRID 4326**, permitindo que sejam tratadas como dados geoespaciais.
+As coordenadas são persistidas no PostgreSQL/PostGIS utilizando **SRID 4326**, permitindo que sejam tratadas como dados geoespaciais.
 
-Exemplo conceitual:
-
-```text
-latitude + longitude
-        ↓
-Spring Boot
-        ↓
-JTS Point (SRID 4326)
-        ↓
-PostgreSQL + PostGIS
-```
-
----
-
-### Geração de rota de visitas
+### Geração de rota
 
 As visitas com status `PENDENTE` podem ser organizadas automaticamente em uma sequência otimizada.
 
-O Spring Boot envia as coordenadas para o **OSRM**, utilizando um ponto de origem fixo para iniciar a rota.
+O Spring Boot envia as coordenadas para o **OSRM**, utilizando um ponto de origem fixo. O OSRM utiliza a malha viária do **OpenStreetMap** para calcular uma sequência eficiente entre os destinos.
 
-O OSRM utiliza a malha viária do **OpenStreetMap** para determinar uma sequência eficiente entre os destinos.
+A ordem calculada é persistida no banco, evitando que a sequência restante seja recalculada quando a página é atualizada ou uma visita é concluída.
 
-```text
-Visitas pendentes
-        ↓
-Spring Boot
-        ↓
-OSRM
-        ↓
-OpenStreetMap
-        ↓
-Sequência otimizada
-```
-
-O backend interpreta a ordem retornada pelo OSRM e associa cada posição à respectiva visita.
-
----
-
-### Persistência da ordem da rota
-
-A ordem calculada pelo OSRM é persistida no próprio registro da visita.
-
-Isso evita que a rota seja recalculada sempre que:
-
-- a página for atualizada;
-- uma visita for concluída;
-- uma visita for marcada como ausente.
-
-Enquanto houver uma rota em andamento, o backend recupera a sequência já salva no banco.
-
-Uma nova rota somente é calculada quando o usuário seleciona explicitamente **Gerar nova rota**.
-
----
+Uma nova rota é gerada somente quando solicitada pelo usuário.
 
 ### Controle das visitas
 
@@ -136,75 +92,40 @@ Durante a execução da rota, cada parada pode ser marcada como:
 - **Visitado**
 - **Ausente**
 
-Quando uma visita é concluída, ela deixa de fazer parte da rota atual.
+Ao registrar uma ausência, o sistema incrementa o número de tentativas.
 
-No caso de ausência, o sistema incrementa o número de tentativas. Enquanto o limite definido não for atingido, a visita pode continuar com status `PENDENTE` e participar de uma futura rodada.
-
----
+Enquanto o limite definido não é atingido, a visita permanece com status `PENDENTE` e pode participar de uma nova rodada de visitas.
 
 ### Navegação com Google Maps e Waze
-
-O projeto não implementa um navegador GPS próprio.
 
 Para cada parada da rota, o frontend disponibiliza opções para abrir diretamente o destino no:
 
 - Google Maps
 - Waze
 
-A divisão de responsabilidades fica:
-
-```text
-GeoField Tracker
-→ determina qual deve ser a próxima visita
-
-Google Maps / Waze
-→ realiza a navegação até o destino
-```
-
----
+A aplicação é responsável por definir a **sequência das visitas**, enquanto Google Maps e Waze ficam responsáveis pela navegação até cada destino.
 
 ### Paginação da rota
 
-A rota completa permanece disponível no frontend, mas as visitas são divididas em páginas para facilitar a utilização com uma quantidade maior de pontos.
+A rota completa é mantida no frontend, mas as visitas são divididas em páginas para facilitar a utilização com uma quantidade maior de destinos.
 
-A paginação altera apenas a visualização.
+A paginação altera apenas a visualização e preserva a posição original de cada visita na rota.
 
-A ordem original calculada para a rota é preservada.
+### Confirmação de ações
 
-Exemplo:
-
-```text
-Página 1
-1 - Visita A
-2 - Visita B
-...
-10 - Visita J
-
-Página 2
-11 - Visita K
-12 - Visita L
-...
-```
-
----
-
-### Confirmação e controle de ações
-
-A interface utiliza modais de confirmação antes de operações importantes, como:
+A interface utiliza modais de confirmação antes de operações que alteram o estado das visitas, como:
 
 - marcar uma visita como realizada;
 - registrar uma ausência;
 - gerar uma nova rota.
 
-Os botões também são temporariamente bloqueados enquanto uma requisição está sendo processada, evitando múltiplos envios acidentais.
-
----
+Durante as requisições, os botões são temporariamente bloqueados para evitar múltiplos envios.
 
 ### Progressive Web App
 
 O frontend foi desenvolvido com foco em dispositivos móveis e configurado como **Progressive Web App (PWA)**.
 
-A aplicação possui fluxos separados para:
+A aplicação possui dois fluxos principais:
 
 - registro de localização;
 - execução da rota de visitas.
@@ -212,8 +133,6 @@ A aplicação possui fluxos separados para:
 ---
 
 ## Arquitetura
-
-A aplicação segue uma arquitetura onde cada tecnologia possui uma responsabilidade específica:
 
 ```text
                  Angular PWA
@@ -225,15 +144,12 @@ A aplicação segue uma arquitetura onde cada tecnologia possui uma responsabili
                 /            \
                ▼              ▼
       PostgreSQL/PostGIS     OSRM
-               │              │
-               │              ▼
-               │        OpenStreetMap
-               │
-               ▼
-      Dados das visitas
+                              │
+                              ▼
+                        OpenStreetMap
 ```
 
-Para a navegação:
+Para a navegação até cada destino:
 
 ```text
 Angular
@@ -246,60 +162,60 @@ Google Maps / Waze
 ### Responsabilidades
 
 **Angular**
-- interface;
+
+- interface da aplicação;
 - captura da localização;
 - exibição da rota;
+- paginação;
 - interação com o usuário.
 
 **Spring Boot**
+
 - regras de negócio;
 - gerenciamento das visitas;
-- integração com o banco;
+- controle de tentativas;
+- persistência da ordem da rota;
+- integração com o banco de dados;
 - integração com o OSRM.
 
 **PostgreSQL/PostGIS**
-- persistência;
+
+- persistência dos dados;
 - armazenamento geoespacial das coordenadas.
 
 **OSRM**
+
 - análise da malha viária;
-- cálculo da sequência de visitas.
+- cálculo da sequência das visitas.
 
 **OpenStreetMap**
-- dados da rede de ruas utilizados pelo OSRM.
+
+- fornecimento dos dados da rede viária utilizados pelo OSRM.
 
 **Google Maps / Waze**
+
 - navegação entre a localização atual da equipe e o próximo destino.
 
 ---
 
-## Evolução da solução de roteamento
+## Decisões técnicas
 
-Durante o desenvolvimento, diferentes estratégias de roteamento foram estudadas.
+O roteamento foi inicialmente explorado utilizando PostGIS, pgRouting e algoritmos de caminho mínimo.
 
-Inicialmente, foi utilizada uma abordagem baseada em:
+A responsabilidade pelo cálculo da sequência de visitas foi posteriormente transferida para o **OSRM**, permitindo manter o PostGIS responsável pelo armazenamento geoespacial e utilizar um motor especializado para roteamento sobre a malha do OpenStreetMap.
 
-- PostGIS;
-- pgRouting;
-- grafos;
-- vértices e arestas;
-- algoritmo de Dijkstra;
-- dados viários importados do OpenStreetMap.
+A ordem retornada pelo OSRM é persistida na própria visita durante a execução da rota.
 
-Essa implementação permitiu compreender como uma rede viária pode ser representada como um grafo e como caminhos mínimos são calculados.
+Dessa forma, concluir ou remover uma parada não provoca um novo cálculo e não altera a sequência restante.
 
-Entretanto, a solução exigia implementar manualmente recursos que já são tratados por motores especializados de roteamento.
-
-Por isso, a arquitetura evoluiu para utilizar o **OSRM**.
-
-A responsabilidade passou a ser dividida da seguinte forma:
+Essa separação mantém as responsabilidades da aplicação bem definidas:
 
 ```text
 PostGIS
 → armazenamento geoespacial
 
 OSRM
-→ roteamento e ordenação das visitas
+→ cálculo e otimização da sequência
 
 Spring Boot
 → regras de negócio e integração
@@ -313,85 +229,10 @@ Google Maps / Waze
 
 ---
 
-## Persistência da rota
-
-Durante o desenvolvimento foi identificado outro problema: recalcular a rota após cada visita concluída poderia alterar completamente a sequência restante.
-
-Exemplo:
+## Estrutura do projeto
 
 ```text
-Rota original
-
-1 - A
-2 - B
-3 - C
-4 - D
-```
-
-Após concluir `A`, uma nova chamada ao algoritmo poderia retornar:
-
-```text
-1 - C
-2 - D
-3 - B
-```
-
-Para evitar esse comportamento, a ordem calculada é persistida no banco.
-
-Exemplo:
-
-```text
-Visita A → ordemRota = 1
-Visita B → ordemRota = 2
-Visita C → ordemRota = 3
-Visita D → ordemRota = 4
-```
-
-Ao concluir uma visita:
-
-```text
-ordemRota → null
-```
-
-As demais continuam com suas posições originais.
-
-Dessa forma, atualizar a página não provoca um novo cálculo da rota.
-
----
-
-## Integração com QGIS
-
-O PostGIS também pode ser conectado ao **QGIS** durante o desenvolvimento.
-
-Isso permite visualizar os pontos registrados e analisar os dados geográficos diretamente sobre um mapa.
-
-O QGIS funciona como uma ferramenta auxiliar de desenvolvimento e análise e não faz parte da interface utilizada pelo usuário final.
-
----
-
-## Testes
-
-A estrutura de testes do backend utiliza:
-
-- JUnit
-- Mockito
-- MockMvc
-
-Os testes serão utilizados para validar principalmente:
-
-- regras de negócio das visitas;
-- geração e persistência da rota;
-- comportamento quando uma rota já existe;
-- controle de tentativas;
-- endpoints REST;
-- tratamento de cenários de erro.
-
----
-
-## Estrutura geral do projeto
-
-```text
-geolocalizacao/
+geolocalization-system/
 │
 ├── back-end/
 │   └── Spring Boot
@@ -405,84 +246,63 @@ geolocalizacao/
 
 ---
 
-## Roadmap
+## Testes
 
-### Concluído
+O projeto utiliza as seguintes tecnologias para testes automatizados do backend:
 
-- [x] Cadastro e consulta de localizações
-- [x] Captura de coordenadas pelo navegador
-- [x] Persistência geoespacial com PostGIS
-- [x] Interface mobile-first
-- [x] Configuração como PWA
-- [x] Integração com OSRM
-- [x] Utilização da malha do OpenStreetMap
-- [x] Otimização da sequência de visitas
-- [x] Persistência da ordem da rota
-- [x] Controle de visitas realizadas
-- [x] Controle de ausências e tentativas
-- [x] Geração manual de novas rotas
-- [x] Integração com Google Maps
-- [x] Integração com Waze
-- [x] Paginação da rota no frontend
-- [x] Confirmação de ações
-- [x] Proteção contra múltiplos envios
+- JUnit
+- Mockito
+- MockMvc
 
-### Próximas etapas
-
-- [ ] Ampliar cobertura de testes automatizados
-- [ ] Testar o sistema com maior volume de localizações
-- [ ] Configurar CI com GitHub Actions
-- [ ] Deploy do frontend
-- [ ] Deploy do backend
-- [ ] Configuração do banco em ambiente de produção
-- [ ] Deploy do serviço OSRM
+Os testes são voltados para regras de negócio, serviços e endpoints da aplicação.
 
 ---
 
-## Deploy planejado
-
-A arquitetura planejada para produção é:
+## Fluxo da aplicação
 
 ```text
-Vercel
-→ Angular
-
-Render
-→ Spring Boot
-
-Supabase
-→ PostgreSQL + PostGIS
-
-Serviço dedicado/container
-→ OSRM
+Captura da localização
+        ↓
+Angular
+        ↓
+API REST
+        ↓
+Spring Boot
+        ↓
+PostgreSQL + PostGIS
+        ↓
+Visitas pendentes
+        ↓
+OSRM
+        ↓
+Sequência otimizada
+        ↓
+Angular
+        ↓
+Google Maps / Waze
+        ↓
+Visitado / Ausente
 ```
-
-A infraestrutura poderá ser ajustada após os testes de consumo de recursos do OSRM.
 
 ---
 
-## Status
+## Status do projeto
 
-O projeto está em desenvolvimento.
+O sistema foi concluído dentro do escopo proposto e possui o fluxo principal de utilização funcional.
 
-O fluxo principal já permite:
+A aplicação permite:
 
-```text
-Cadastrar localização
-        ↓
-Armazenar no PostGIS
-        ↓
-Gerar rota
-        ↓
-OSRM otimiza a sequência
-        ↓
-Executar visitas
-        ↓
-Abrir destino no Maps/Waze
-        ↓
-Registrar Visitado/Ausente
-        ↓
-Gerar uma nova rodada quando necessário
-```
+- cadastrar e consultar localizações;
+- capturar coordenadas diretamente pelo navegador;
+- armazenar dados geoespaciais com PostGIS;
+- gerar uma sequência otimizada de visitas com OSRM;
+- preservar a ordem da rota durante sua execução;
+- abrir os destinos no Google Maps e Waze;
+- registrar visitas realizadas e ausências;
+- controlar tentativas de visita;
+- gerar novas rodadas manualmente;
+- paginar as visitas no frontend;
+- confirmar ações antes de alterações;
+- evitar múltiplos envios durante requisições.
 
-As próximas etapas estão concentradas em testes automatizados, validação com maior volume de dados, integração contínua e deploy.
+A arquitetura foi estruturada para execução em ambiente de produção.
