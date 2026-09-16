@@ -1,1 +1,12 @@
 Qgis/
+
+# Variáveis locais
+.env
+**/.env
+
+# Arquivos gerados pelo OSRM
+*.osrm
+*.osrm.*
+
+# Arquivos compactados locais
+osrm.zip
