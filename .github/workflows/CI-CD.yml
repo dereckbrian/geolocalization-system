@@ -180,3 +180,16 @@ jobs:
 
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/geolocalization-backend:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/geolocalization-backend:buildcache,mode=max
+
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy app
+    needs: build-docker-image
+    steps:
+      - name: Deploying to Render
+        uses: gh-actions-workflows/deploy-docker-render@v1.1
+        with:
+          deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
+          image-url: ${{ secrets.DOCKERHUB_USERNAME }}/geolocalization-backend:latest
+          render-api-key: ${{ secrets.RENDER_API_KEY }}
+          wait-for-deployment: true
