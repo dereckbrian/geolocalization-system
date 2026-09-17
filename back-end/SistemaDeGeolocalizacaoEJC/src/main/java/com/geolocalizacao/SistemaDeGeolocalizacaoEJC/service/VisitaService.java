@@ -33,7 +33,6 @@ public class VisitaService {
     private final VisitaMapper visitaMapper;
     private final JovemRepository jovemRepository;
     private final TioRespository tioRespository;
-    private final RotaService rotaService;
 
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 

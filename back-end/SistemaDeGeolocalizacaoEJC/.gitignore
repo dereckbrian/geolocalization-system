@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Variáveis locais
+.env
+**/.env
+
+osrm/*.osrm*
