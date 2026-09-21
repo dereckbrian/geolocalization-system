@@ -12,18 +12,18 @@ on:
 jobs:
 
   compile:
-    runs-on: ubuntu-lasted
-    name: Compile project
+    runs-on: ubuntu-latest
+    name: Compile project front
 
     defaults:
       run:
         working-directory: front-end/project-for-ejcGeolocalization
 
     steps:
-      - name: Checkout code
+      - name: Checkout code front
         uses: actions/checkout@v4
 
-      - name: Setup node and cache
+      - name: Setup node and cache front
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -32,11 +32,11 @@ jobs:
       - name: install dependecies
         run: npm ci
 
-      - name: compile project
+      - name: compile project front
         run: npm run build
 
   test:
-    runs-on: ubuntu-lasted
+    runs-on: ubuntu-latest
     name: Teste app
 
     defaults:
@@ -44,24 +44,24 @@ jobs:
         working-directory: front-end/project-for-ejcGeolocalization
 
     steps:
-      - name: Checkout code
+      - name: Checkout code front
         uses: action/checkout@v4
 
-      - name: Setup node and cache
+      - name: Setup node and cache front
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
       
-      - name: install dependecies
+      - name: install dependecies front
         run: npm ci
 
-      - name: Run tests
+      - name: Run tests front
         run: npm test
 
   build:
     runs-on: ubuntu-latest
-    name: build-app
+    name: build-app front
 
     needs:
       - compile
@@ -72,7 +72,7 @@ jobs:
          working-directory: front-end/project-for-ejcGeolocalization
 
     steps:
-      - name: Checkout code
+      - name: Checkout code front
         uses: actions/checkout@v4
 
       - name: Setup node and cache
@@ -81,10 +81,10 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: install dependecies
+      - name: install dependecies front
         run: npm ci
 
-      - name: Build project
+      - name: Build project front
         run: npm run build 
 
 
