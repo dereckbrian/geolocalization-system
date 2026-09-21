@@ -3,6 +3,7 @@
   <div class="max-w-2xl mx-auto px-6 py-10">
 
     <!-- VOLTAR -->
+
     <a
       routerLink="/"
       class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-8"
@@ -10,8 +11,8 @@
       ← Voltar
     </a>
 
-
     <!-- CABEÇALHO -->
+
     <div class="mb-8">
 
       <h1 class="text-3xl font-bold text-gray-900">
@@ -24,8 +25,8 @@
 
     </div>
 
-
     <!-- CARREGANDO -->
+
     @if (carregando) {
 
       <div class="bg-white border border-gray-200 rounded-2xl p-6 text-center">
@@ -38,8 +39,8 @@
 
     }
 
-
     <!-- ERRO -->
+     
     @if (erro) {
 
       <div class="bg-white border border-red-200 rounded-2xl p-6">
@@ -59,8 +60,8 @@
 
     }
 
-
     <!-- ROTA -->
+
     @if (!carregando && !erro) {
 
       <div class="space-y-4">
@@ -74,6 +75,7 @@
             <div class="flex items-start gap-4">
 
               <!-- ORDEM -->
+
               <div
                 class="w-10 h-10 rounded-full bg-gray-900 text-white
                        flex items-center justify-center font-bold shrink-0"
@@ -81,11 +83,12 @@
                 {{ visita.ordem }}
               </div>
 
-
               <!-- CONTEÚDO DO CARD -->
+
               <div class="flex-1">
 
                 <!-- JOVEM -->
+
                 <h2 class="font-semibold text-lg text-gray-900">
                   {{ visita.jovem }}
                 </h2>
@@ -94,8 +97,8 @@
                   Próxima parada da rota
                 </p>
 
-
                 <!-- NAVEGAÇÃO -->
+
                 <div class="grid grid-cols-2 gap-3 mt-4">
 
                   <button
@@ -114,8 +117,8 @@
 
                 </div>
 
-
                 <!-- RESULTADO DA VISITA -->
+
                 <div class="grid grid-cols-2 gap-3 mt-3">
 
                     <button
@@ -147,6 +150,7 @@
         }
 
         <!-- PAGINAÇÃO -->
+
         @if (rota.length > 0) {
 
             <div class="flex items-center justify-between mt-6">
@@ -182,6 +186,7 @@
         }
 
         <!-- NENHUMA VISITA -->
+         
         @if (rota.length === 0) {
 
         <div

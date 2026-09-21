@@ -1,55 +1,55 @@
-services:
+  services:
 
-  postgres:
+    postgres:
 
-    image: postgis/postgis:15-3.3
+      image: postgis/postgis:15-3.3
 
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      environment:
+        POSTGRES_DB: ${POSTGRES_DB}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-    ports:
-      - "5433:5432"
+      ports:
+        - "5433:5432"
 
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
 
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d sistemaGeolocalizacaoEJC"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-
-  osrm:
-
-    build:
-      context: ./osrm
-
-    ports:
-      - "5000:5000"
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U postgres -d sistemaGeolocalizacaoEJC"]
+        interval: 5s
+        timeout: 5s
+        retries: 10
 
 
-  backend:
+    osrm:
 
-    build:
-      context: .
+      build:
+        context: ./osrm
 
-    ports:
-      - "8080:8080"
+      ports:
+        - "5000:5000"
 
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      OSRM_URL: http://osrm:5000
 
-    depends_on:
-      postgres:
-        condition: service_healthy
-      osrm:
-        condition: service_started
+    backend:
 
-volumes:
-  postgres_data:
+      build:
+        context: .
+
+      ports:
+        - "8080:8080"
+
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+        SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+        SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+        OSRM_URL: http://osrm:5000
+
+      depends_on:
+        postgres:
+          condition: service_healthy
+        osrm:
+          condition: service_started
+
+  volumes:
+    postgres_data:
