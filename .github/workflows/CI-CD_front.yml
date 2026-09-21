@@ -23,11 +23,12 @@ jobs:
       - name: Checkout code front
         uses: actions/checkout@v4
 
-      - name: Setup node and cache front
+      - name: Setup Node and cache front
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
+          cache-dependency-path: front-end/project-for-ejcGeolocalization/package-lock.json
 
       - name: install dependecies
         run: npm ci
@@ -45,13 +46,14 @@ jobs:
 
     steps:
       - name: Checkout code front
-        uses: action/checkout@v4
+        uses: actions/checkout@v4
 
-      - name: Setup node and cache front
+      - name: Setup Node and cache front
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
+          cache-dependency-path: front-end/project-for-ejcGeolocalization/package-lock.json
       
       - name: install dependecies front
         run: npm ci
@@ -75,11 +77,12 @@ jobs:
       - name: Checkout code front
         uses: actions/checkout@v4
 
-      - name: Setup node and cache
+      - name: Setup Node and cache front
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
+          cache-dependency-path: front-end/project-for-ejcGeolocalization/package-lock.json
 
       - name: install dependecies front
         run: npm ci
