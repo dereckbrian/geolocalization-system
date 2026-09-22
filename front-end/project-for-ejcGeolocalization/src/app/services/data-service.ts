@@ -35,23 +35,28 @@ export class DataService {
   }
 
   buscarRota(): Observable<RotaVisita[]> {
-  return this.http.get<RotaVisita[]>('/api/visita/rota');
+    return this.http.get<RotaVisita[]>(
+      `${this.apiUrl}/visita/rota`
+    );
   }
 
-  gerarRota(): Observable<RotaVisita[]>{
-    return this.http.post<RotaVisita[]>(`api/visita/rota/gerar`, {});
-  }
-
-  registrarSucesso(visitaId: string){
-    return this.http.patch(
-      `api/visita/${visitaId}/sucesso`,
+    gerarRota(): Observable<RotaVisita[]> {
+    return this.http.post<RotaVisita[]>(
+      `${this.apiUrl}/visita/rota/gerar`,
       {}
     );
   }
 
-  registrarFalta(visitaId: string){
+    registrarSucesso(visitaId: string) {
     return this.http.patch(
-      `api/visita/${visitaId}/falta`,
+      `${this.apiUrl}/visita/${visitaId}/sucesso`,
+      {}
+    );
+  }
+
+    registrarFalta(visitaId: string) {
+    return this.http.patch(
+      `${this.apiUrl}/visita/${visitaId}/falta`,
       {}
     );
   }
