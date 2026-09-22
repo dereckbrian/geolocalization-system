@@ -194,7 +194,7 @@ describe('DataService', () => {
     });
 
     const req = httpMock.expectOne(
-      'api/visita/rota/gerar'
+      '/api/visita/rota/gerar'
     );
 
     expect(req.request.method).toBe('POST');
@@ -222,7 +222,7 @@ describe('DataService', () => {
     });
 
     const req = httpMock.expectOne(
-      `api/visita/${visitaId}/sucesso`
+      `/api/visita/${visitaId}/sucesso`
     );
 
     expect(req.request.method).toBe('PATCH');
@@ -250,7 +250,7 @@ describe('DataService', () => {
     });
 
     const req = httpMock.expectOne(
-      `api/visita/${visitaId}/falta`
+      `/api/visita/${visitaId}/falta`
     );
 
     expect(req.request.method).toBe('PATCH');
