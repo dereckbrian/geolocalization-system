@@ -70,15 +70,10 @@ class VisitaServiceTest {
         when(dto.longitude()).thenReturn(-47.3344);
 
         when(visitaRepository.existsByJovemId(jovemId)).thenReturn(false);
-
         when(jovemRepository.getReferenceById(jovemId)).thenReturn(jovem);
-
         when(tioRespository.getReferenceById(tioId)).thenReturn(tio);
-
         when(visitaMapper.toEntity(dto)).thenReturn(visitaMapeada);
-
         when(visitaRepository.save(any(Visita.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
         when(visitaMapper.toEntityToDTO(any(Visita.class))).thenReturn(responseEsperado);
 
         VisitaResponseDTO response = visitaService.cadastrarVisita(dto);

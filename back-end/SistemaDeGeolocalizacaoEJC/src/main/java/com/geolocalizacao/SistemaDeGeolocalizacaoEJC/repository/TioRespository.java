@@ -9,4 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface TioRespository extends JpaRepository<Tio, UUID> {
+    Boolean existsByCpf(String cpf);
 }

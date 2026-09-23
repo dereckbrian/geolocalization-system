@@ -1,6 +1,7 @@
 package com.geolocalizacao.SistemaDeGeolocalizacaoEJC.infra.config;
 
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.exceptions.JovemHasExistException;
+import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.exceptions.TioHasExistException;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.exceptions.VisitaNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -31,5 +32,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setTitle("Visita não encontrada");
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
+    }
+
+    @ExceptionHandler(TioHasExistException.class)
+    public ResponseEntity<ProblemDetail> handleTioHasExistException(TioHasExistException exception){
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                "Tio já existe"
+        );
+        problemDetail.setTitle("Tio Existe");
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
     }
 }

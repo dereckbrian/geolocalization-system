@@ -1,7 +1,9 @@
 package com.geolocalizacao.SistemaDeGeolocalizacaoEJC.service;
 
+import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.dtos.tio.CadastroTioDTO;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.dtos.tio.TioResponseDTO;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.entity.Tio;
+import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.exceptions.TioHasExistException;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.mappers.TioMapper;
 import com.geolocalizacao.SistemaDeGeolocalizacaoEJC.repository.TioRespository;
 import org.junit.jupiter.api.DisplayName;
@@ -66,5 +68,41 @@ class TioServiceTest {
 
         verify(tioRespository).findAll();
         verifyNoInteractions(tioMapper);
+    }
+
+    @Test
+    @DisplayName("Should register sucess")
+    void cadastrarTioSucesso(){
+        CadastroTioDTO tioParaCadastrar = new CadastroTioDTO("Tio joao e alice", "123456", "12345678");
+        Tio tioParaSalvar = new Tio();
+        Tio tioSalvo = new Tio();
+        TioResponseDTO tioResponse = new TioResponseDTO("Tio joao e alice");
+
+        when(tioMapper.dtoToEntity(tioParaCadastrar)).thenReturn(tioParaSalvar);
+        when(tioRespository.save(tioParaSalvar)).thenReturn(tioSalvo);
+        when(tioRespository.existsByCpf("123456")).thenReturn(false);
+        when(tioMapper.toResponseDTO(tioSalvo)).thenReturn(tioResponse);
+
+        TioResponseDTO response = tioService.cadastrarTio(tioParaCadastrar);
+
+        assertNotNull(response);
+        assertEquals(tioResponse, response);
+
+        verify(tioMapper).dtoToEntity(tioParaCadastrar);
+        verify(tioRespository).save(tioParaSalvar);
+        verify(tioMapper).toResponseDTO(tioSalvo);
+    }
+
+    @Test
+    @DisplayName("Should register sucess")
+    void cadastrarTioFaild(){
+        CadastroTioDTO tioParaCadastrar = new CadastroTioDTO("Tio joao e alice", "123456", "12345678");
+
+        when(tioRespository.existsByCpf("123456")).thenReturn(true);
+
+        assertThrows(TioHasExistException.class, ()->tioService.cadastrarTio(tioParaCadastrar));
+
+        verify(tioRespository).existsByCpf("123456");
+        verify(tioRespository, never()).save(any());
     }
 }
